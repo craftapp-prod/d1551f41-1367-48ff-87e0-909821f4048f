@@ -1,96 +1,135 @@
-import Link from "next/link";
-import { Shield, User, Lock } from "lucide-react";
+"use client";
+import { useState, useEffect } from 'react';
+import { Play, Pause, RotateCcw, Settings, Clock } from 'lucide-react';
 
-export default function Home() {
+export default function TimerPage() {
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [inputMinutes, setInputMinutes] = useState(0);
+  const [inputSeconds, setInputSeconds] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isRunning && time > 0) {
+      interval = setInterval(() => {
+        setTime(prevTime => prevTime - 1);
+      }, 1000);
+    } else if (time === 0 && isRunning) {
+      setIsRunning(false);
+    }
+    return () => clearInterval(interval);
+  }, [isRunning, time]);
+
+  const handleStartPause = () => {
+    if (time === 0 && !isRunning) {
+      const totalSeconds = inputMinutes * 60 + inputSeconds;
+      setTime(totalSeconds);
+    }
+    setIsRunning(!isRunning);
+  };
+
+  const handleReset = () => {
+    setIsRunning(false);
+    setTime(0);
+    setInputMinutes(0);
+    setInputSeconds(0);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === 'minutes') {
+      setInputMinutes(Math.max(0, parseInt(value) || 0));
+    } else {
+      setInputSeconds(Math.max(0, parseInt(value) || 0));
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center">
-      <section className="w-full py-12 md:py-24 text-center">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">
-                Craftapp.ai
-              </h1>
-              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl">
-                Welcome to craftapp
-              </p>
-            </div>
-            <div className="space-x-4">
-              <Link
-                href="#"
-                className="inline-flex h-10 items-center justify-center rounded-md bg-primary-600 px-8 text-sm font-medium text-white shadow transition-colors hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-500"
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="flex flex-col items-center justify-center min-h-screen py-12 bg-gray-50">
+      <div className="w-full max-w-md mx-auto">
+        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">MiniTimer</h1>
 
-      <section className="w-full py-12 md:py-24 bg-gray-100">
-        <div className="container px-4 md:px-6">
-          <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
-              Key Features
-            </h2>
-            <p className="max-w-[85%] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Modern full-stack web application, single page application, real
-              time game....
-            </p>
+          <div className="mb-8">
+            <div className="text-7xl font-bold text-primary-600 mb-4">
+              {formatTime(time || (inputMinutes * 60 + inputSeconds))}
+            </div>
+            <div className="text-sm text-gray-500">Time Remaining</div>
           </div>
-          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-3">
-            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
-              <div className="p-3 rounded-full bg-primary-100">
-                <User className="h-6 w-6 text-primary-600" />
-              </div>
-              <h3 className="text-xl font-bold">Full-Stack web app</h3>
-              <p className="text-sm text-gray-500 text-center">
-                Complete user registration, authentication, and profile
-                management...
-              </p>
-            </div>
-            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
-              <div className="p-3 rounded-full bg-primary-100">
-                <Lock className="h-6 w-6 text-primary-600" />
-              </div>
-              <h3 className="text-xl font-bold">Single Page app</h3>
-              <p className="text-sm text-gray-500 text-center">
-                amazing single page apps.
-              </p>
-            </div>
-            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
-              <div className="p-3 rounded-full bg-primary-100">
-                <Shield className="h-6 w-6 text-primary-600" />
-              </div>
-              <h3 className="text-xl font-bold">Real time apps</h3>
-              <p className="text-sm text-gray-500 text-center">
-                Amazing real time app like game, stop watch ....
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section className="w-full py-12 md:py-24">
-        <div className="container px-4 md:px-6">
-          <div className="mx-auto max-w-[58rem] flex flex-col items-center justify-center space-y-4 text-center">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
-              Ready to get started?
-            </h2>
-            <p className="max-w-[85%] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Create your own app now
-            </p>
-            <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Link
-                href="#"
-                className="inline-flex h-10 items-center justify-center rounded-md bg-primary-600 px-8 text-sm font-medium text-white shadow transition-colors hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-500"
-              >
-                Start Now ...
-              </Link>
+          <div className="flex justify-center space-x-4 mb-8">
+            <div className="flex items-center">
+              <input
+                type="number"
+                name="minutes"
+                value={inputMinutes}
+                onChange={handleInputChange}
+                className="w-16 text-center border border-gray-300 rounded-md py-2 text-lg"
+                min="0"
+              />
+              <span className="ml-2 text-gray-600">Minutes</span>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="number"
+                name="seconds"
+                value={inputSeconds}
+                onChange={handleInputChange}
+                className="w-16 text-center border border-gray-300 rounded-md py-2 text-lg"
+                min="0"
+                max="59"
+              />
+              <span className="ml-2 text-gray-600">Seconds</span>
             </div>
           </div>
+
+          <div className="flex justify-center space-x-4">
+            <button
+              onClick={handleStartPause}
+              className={`flex items-center justify-center w-16 h-16 rounded-full shadow-md transition-all duration-200 ${isRunning ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-primary-600 hover:bg-primary-700'} text-white`}
+            >
+              {isRunning ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+            </button>
+            <button
+              onClick={handleReset}
+              className="flex items-center justify-center w-16 h-16 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 transition-all duration-200"
+            >
+              <RotateCcw className="w-6 h-6" />
+            </button>
+          </div>
         </div>
-      </section>
+
+        <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center justify-center">
+            <Settings className="w-5 h-5 mr-2" />
+            Timer Instructions
+          </h2>
+          <ul className="space-y-2 text-gray-600">
+            <li className="flex items-start">
+              <Clock className="w-4 h-4 mt-1 mr-2 text-primary-500 flex-shrink-0" />
+              <span>Set your desired time using the minute and second inputs</span>
+            </li>
+            <li className="flex items-start">
+              <Clock className="w-4 h-4 mt-1 mr-2 text-primary-500 flex-shrink-0" />
+              <span>Click the play button to start the timer</span>
+            </li>
+            <li className="flex items-start">
+              <Clock className="w-4 h-4 mt-1 mr-2 text-primary-500 flex-shrink-0" />
+              <span>Use pause to temporarily stop the timer</span>
+            </li>
+            <li className="flex items-start">
+              <Clock className="w-4 h-4 mt-1 mr-2 text-primary-500 flex-shrink-0" />
+              <span>Click reset to clear the timer and start over</span>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
