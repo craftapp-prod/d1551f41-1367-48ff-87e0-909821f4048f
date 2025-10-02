@@ -27,9 +27,7 @@ const nextConfig: NextConfig = {
     ],
     unoptimized: true,
   },
-  output: "export",
-  trailingSlash: true,
-  distDir: "out",
-};
+  output: "standalone",
+  trailingSlash: true,};
 
 export default nextConfig;
